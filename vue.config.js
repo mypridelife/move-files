@@ -21,12 +21,12 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       builderOptions: {
-        // win: {
-        //   icon: "./public/app.png"
-        // },
-        // mac: {
-        //   icon: "./public/app2.png"
-        // },
+        win: {
+          icon: "./public/app.png"
+        },
+        mac: {
+          icon: "./public/app.png"
+        },
         productName: "MoveFiles"
       }
     }

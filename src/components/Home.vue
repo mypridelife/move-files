@@ -96,6 +96,12 @@
             开始移动文件
           </sui-button>
         </div>
+        <div class="m-message" v-show="isFinish">
+          <sui-message>
+            <sui-message-header>移动完成</sui-message-header>
+            <p>一共移动了{{ fileCount }}个文件</p>
+          </sui-message>
+        </div>
       </div>
     </div>
   </div>
@@ -110,45 +116,53 @@ export default {
   data() {
     return {
       //表单数据
-      oldPath: "",
-      newPath: "",
+      oldPath: localStorage.getItem("oldPath")
+        ? localStorage.getItem("oldPath")
+        : "",
+      newPath: localStorage.getItem("newPath")
+        ? localStorage.getItem("newPath")
+        : "",
       ismoving: false,
       oldPathIsNotExits: false,
       newPathIsNotExits: false,
 
       //tab数据
-      allType: {
-        videoType: [
-          { key: ".mp4", value: false },
-          { key: ".wmv", value: false },
-          { key: ".rmvb", value: false },
-          { key: ".avi", value: false },
-          { key: "mkv", value: false },
-          { key: ".rm", value: false },
-          { key: ".mov", value: false },
-          { key: ".flv", value: false }
-        ],
-        imageType: [
-          { key: ".png", value: false },
-          { key: ".jpg", value: false },
-          { key: ".gif", value: false },
-          { key: ".jpeg", value: false },
-          { key: ".bmp", value: false }
-        ],
-        otherType: [
-          { key: ".rar", value: false },
-          { key: ".zip", value: false },
-          { key: ".7z", value: false },
-          { key: ".iso", value: false },
-          { key: ".wav", value: false },
-          { key: ".flac", value: false },
-          { key: ".mp3", value: false },
-          { key: ".aac", value: false }
-        ]
-      },
+      allType: JSON.parse(localStorage.getItem("allType"))
+        ? JSON.parse(localStorage.getItem("allType"))
+        : {
+            videoType: [
+              { key: ".mp4", value: false },
+              { key: ".wmv", value: false },
+              { key: ".rmvb", value: false },
+              { key: ".avi", value: false },
+              { key: "mkv", value: false },
+              { key: ".rm", value: false },
+              { key: ".mov", value: false },
+              { key: ".flv", value: false }
+            ],
+            imageType: [
+              { key: ".png", value: false },
+              { key: ".jpg", value: false },
+              { key: ".gif", value: false },
+              { key: ".jpeg", value: false },
+              { key: ".bmp", value: false }
+            ],
+            otherType: [
+              { key: ".rar", value: false },
+              { key: ".zip", value: false },
+              { key: ".7z", value: false },
+              { key: ".iso", value: false },
+              { key: ".wav", value: false },
+              { key: ".flac", value: false },
+              { key: ".mp3", value: false },
+              { key: ".aac", value: false }
+            ]
+          },
       allVideoType: false,
       allImageType: false,
-      allOtherType: false
+      allOtherType: false,
+      fileCount: 0,
+      isFinish: false
     };
   },
   computed: {},
@@ -221,9 +235,10 @@ export default {
       const folderName = parseTime(currentTime, "{y}_{m}_{d}_{h}_{i}_{s}");
       const finalPath = `${newPath}\\${folderName}`;
       this.makeDir(finalPath);
-      const count = this.findFilm(finalPath, oldPath, chooseType);
-      console.log("完成", count);
+      this.findFilm(finalPath, oldPath, chooseType);
       this.ismoving = false;
+      this.isFinish = true;
+      this.setLocalVariable(oldPath, newPath, this.allType);
     },
     /**
      * 确定文件的格式是否是所选的
@@ -232,10 +247,7 @@ export default {
       let meetConditions = false;
       for (let index = 0; index < chooseType.length; index++) {
         const suffix = chooseType[index].key;
-        console.log("hhh");
         if (name.endsWith(suffix)) {
-          console.log("meet");
-
           meetConditions = true;
         }
       }
@@ -252,9 +264,11 @@ export default {
         this.newPathIsNotExits = true;
       }
     },
+    /**
+     * 主要函数-处理文件移动
+     */
     findFilm(finalPath, oldPath, chooseType) {
       const that = this;
-      let count = 0;
       try {
         let downloadDirArr = fs.readdirSync(oldPath, { withFileTypes: true });
         for (let index = 0; index < downloadDirArr.length; index++) {
@@ -270,7 +284,7 @@ export default {
 
             if (that.fileisChooseType(element.name, chooseType)) {
               //移动文件
-              count += 1;
+              that.fileCount += 1;
               try {
                 fs.renameSync(deepPath, newName);
               } catch (error) {
@@ -283,7 +297,14 @@ export default {
         console.log(error);
         this.oldPathIsNotExits = true;
       }
-      return count;
+    },
+    /**
+     * 将输入的内容作为默认设置
+     */
+    setLocalVariable(oldPath, newPath, allType) {
+      localStorage.setItem("oldPath", oldPath);
+      localStorage.setItem("newPath", newPath);
+      localStorage.setItem("allType", JSON.stringify(allType));
     }
   }
 };
@@ -315,6 +336,9 @@ export default {
   margin-right: 20px;
 }
 .m-submit {
+  margin-top: 20px;
+}
+.m-message {
   margin-top: 20px;
 }
 </style>
