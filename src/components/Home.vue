@@ -24,7 +24,7 @@
             pointing="left"
             v-show="oldPathIsNotExits"
           >
-            目录不存在!
+            目录不存在或其他未知问题!
           </sui-label>
         </div>
         <div class="file-oldPath">
@@ -44,7 +44,7 @@
             pointing="left"
             v-show="newPathIsNotExits"
           >
-            目录不存在!
+            目录不存在或其他未知问题!
           </sui-label>
         </div>
         <sui-tab class="tab-container">
@@ -277,7 +277,7 @@ export default {
           if (element.isDirectory()) {
             const deepPath = oldPath + "\\" + element.name;
             //递归查询
-            that.findFilm(deepPath);
+            that.findFilm(finalPath, deepPath, chooseType);
           } else {
             //找到符合所选格式文件
             const deepPath = oldPath + "\\" + element.name;
