@@ -19,7 +19,7 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       nodeIntegration: true
@@ -101,10 +101,10 @@ app.on("ready", async () => {
     // } catch (e) {
     //   console.error("Vue Devtools failed to install:", e.toString());
     // }
-    globalShortcut.register("CommandOrControl+Shift+i", function() {
-      win.webContents.openDevTools();
-    });
   }
+  globalShortcut.register("CommandOrControl+Shift+i", function() {
+    win.webContents.openDevTools();
+  });
   createWindow();
 });
 

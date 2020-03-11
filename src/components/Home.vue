@@ -269,6 +269,7 @@ export default {
      */
     findFilm(finalPath, oldPath, chooseType) {
       const that = this;
+      that.fileCount = 0;
       try {
         let downloadDirArr = fs.readdirSync(oldPath, { withFileTypes: true });
         for (let index = 0; index < downloadDirArr.length; index++) {
@@ -283,12 +284,13 @@ export default {
             const newName = finalPath + "\\" + element.name;
 
             if (that.fileisChooseType(element.name, chooseType)) {
-              //移动文件
-              that.fileCount += 1;
               try {
                 fs.renameSync(deepPath, newName);
+                //移动文件
+                that.fileCount += 1;
               } catch (error) {
                 console.log("rename failed!!!", element, error);
+                this.oldPathIsNotExits = true;
               }
             }
           }
