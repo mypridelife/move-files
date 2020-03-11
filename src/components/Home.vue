@@ -24,7 +24,7 @@
             pointing="left"
             v-show="oldPathIsNotExits"
           >
-            目录不存在或其他未知问题!
+            {{ oldPathError }}
           </sui-label>
         </div>
         <div class="file-oldPath">
@@ -44,7 +44,7 @@
             pointing="left"
             v-show="newPathIsNotExits"
           >
-            目录不存在或其他未知问题!
+            {{ newPathError }}
           </sui-label>
         </div>
         <sui-tab class="tab-container">
@@ -125,6 +125,8 @@ export default {
       ismoving: false,
       oldPathIsNotExits: false,
       newPathIsNotExits: false,
+      oldPathError: "",
+      newPathError: "",
 
       //tab数据
       allType: JSON.parse(localStorage.getItem("allType"))
@@ -216,7 +218,7 @@ export default {
     handleMove() {
       this.newPathIsNotExits = false;
       this.oldPathIsNotExits = false;
-      this.ismoving = true;
+      this.fileCount = 0;
 
       const oldPath = this.oldPath;
       const newPath = this.newPath;
@@ -224,8 +226,15 @@ export default {
       const chooseType = allType.filter(type => {
         return type.value;
       });
+      if (oldPath === "") {
+        this.oldPathIsNotExits = true;
+        this.oldPathError = "目录不存在";
+        return;
+      }
       if (newPath === "") {
         this.newPathIsNotExits = true;
+        this.newPathError = "目录不存在";
+        return;
       }
       console.log("源目录:", oldPath);
       console.log("目的目录:", newPath);
@@ -234,6 +243,7 @@ export default {
       const currentTime = new Date();
       const folderName = parseTime(currentTime, "{y}_{m}_{d}_{h}_{i}_{s}");
       const finalPath = `${newPath}\\${folderName}`;
+      this.ismoving = true;
       this.makeDir(finalPath);
       this.findFilm(finalPath, oldPath, chooseType);
       this.ismoving = false;
@@ -262,6 +272,7 @@ export default {
       } catch (error) {
         console.log(error);
         this.newPathIsNotExits = true;
+        this.newPathError = error;
       }
     },
     /**
@@ -269,7 +280,6 @@ export default {
      */
     findFilm(finalPath, oldPath, chooseType) {
       const that = this;
-      that.fileCount = 0;
       try {
         let downloadDirArr = fs.readdirSync(oldPath, { withFileTypes: true });
         for (let index = 0; index < downloadDirArr.length; index++) {
@@ -291,6 +301,7 @@ export default {
               } catch (error) {
                 console.log("rename failed!!!", element, error);
                 this.oldPathIsNotExits = true;
+                this.oldPathError = error;
               }
             }
           }
@@ -298,6 +309,7 @@ export default {
       } catch (error) {
         console.log(error);
         this.oldPathIsNotExits = true;
+        this.oldPathError = error;
       }
     },
     /**
