@@ -1,5 +1,8 @@
 # move-files
 
+a project for move files quickly
+go release to download 
+
 ## Project setup
 
 ```
